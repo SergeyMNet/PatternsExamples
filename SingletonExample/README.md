@@ -1,21 +1,56 @@
 
-## Create class SomeSingletonClass
+## Singleton without Locks
+The static constructor is only executed when the instance property is called the first time.
 
 ```c#
- public class SomeSingletonClass
+ public sealed class SingletonWithoutLocks
+    {
+        private string Name;
+
+        private static readonly SingletonWithoutLocks instance;
+
+        private SingletonWithoutLocks() {
+            this.Name = Guid.NewGuid().ToString();
+        }
+
+        static SingletonWithoutLocks()
+        {
+            instance = new SingletonWithoutLocks();
+        }
+
+        public static SingletonWithoutLocks Instance
+        {
+            get
+            {
+                return instance;
+            }
+        }
+
+        public void ShowName()
+        {
+            Console.WriteLine(Name);
+        }
+    }
+```
+
+## Singleton with using locks
+Using lazy load.
+
+```c#
+ public class SingletonUseLock
     {
         private string Name;
 
         //the volatile keyword fixed the double lock issue volatile
-        private static SomeSingletonClass _instance;
+        private static SingletonUseLock _instance;
         private static readonly object _syncLock = new object();
 
-        private SomeSingletonClass()
+        private SingletonUseLock()
         {
             this.Name = Guid.NewGuid().ToString();
         }
 
-        public static SomeSingletonClass Instance
+        public static SingletonUseLock Instance
         {
             get
             {
@@ -25,7 +60,7 @@
                 {
                     if (_instance == null)
                     {
-                        _instance = new SomeSingletonClass();
+                        _instance = new SingletonUseLock();
                     }
                 }
                 return _instance;
@@ -37,15 +72,6 @@
             Console.WriteLine(Name);
         }
     }
-```
-
-## Create Task GetName Singleton
-
-```c#
- public static async Task RunTask()
-        {
-            SomeSingletonClass.Instance.ShowName();
-        }
 ```
 
 ## Check Name from different threads
